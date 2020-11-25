@@ -8,7 +8,7 @@ Reworked and expanded from Keras example code by [fchollet](https://twitter.com/
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-from Models import cifar10_modelfn as cf
+from Models import mnist_modelfn as cf
 
 
 # compute loss of input_image wrt a given convolutional filter
@@ -19,7 +19,7 @@ def compute_loss(input_image, filter_index):
     return tf.reduce_mean(filter_activation)
 
 # Adjust image pixels via gradient ascent
-# @tf.function
+@tf.function
 def gradient_ascent_step(img, filter_index, learning_rate):
     with tf.GradientTape() as tape:
         tape.watch(img)
@@ -41,7 +41,7 @@ and restricting it to the [0, 255] range.
 """
 def initialize_image():
     # We start from a gray image with some random noise
-    img = tf.random.uniform(shape=(1, img_width, img_height, 3), maxval=1)
+    img = tf.random.uniform(shape=(1, img_width, img_height, num_channels), maxval=1)
     return img
 
 def visualize_filter(filter_index):
@@ -80,8 +80,9 @@ to get of feel for the range of different
 visual patterns that the model has learned.
 """
 # The dimensions of our input image
-img_width = 32
-img_height = 32
+img_width = 28
+img_height = 28
+num_channels = 1
 model = cf.load_weights()
 for layer_index in range(len(model.get_config()['layers'])-1):
     # Set up a model that returns the activation values for our target layer
@@ -107,7 +108,7 @@ for layer_index in range(len(model.get_config()['layers'])-1):
         cropped_height = img_height
         width = n * (cropped_width + margin)
         height = m * (cropped_height + margin)
-        stitched_filters = np.zeros((height, width, 3))
+        stitched_filters = np.zeros((height, width, num_channels))
 
         # Fill the picture with our saved filters
         for i in range(n):
